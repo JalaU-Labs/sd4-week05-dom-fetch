@@ -18,6 +18,24 @@ import { el } from "./utils/dom.js";
 const PAGE_SIZE = 12;
 
 /**
+ * Retrieves a required element by selector, or throws if missing.
+ *
+ * Returning HTMLElement (not HTMLElement | null) lets callers store the result
+ * in a const binding whose type remains non-null inside nested closures, which
+ * is what TypeScript requires for stable narrowing.
+ *
+ * @param {string} selector
+ * @returns {HTMLElement}
+ */
+function mustGetElement(selector) {
+  const node = document.querySelector(selector);
+  if (!(node instanceof HTMLElement)) {
+    throw new Error(`Required element not found: ${selector}`);
+  }
+  return node;
+}
+
+/**
  * Renders a pagination bar with previous and next buttons.
  *
  * @param {{ page: number, totalPages: number, onChange: (page: number) => void }} options
@@ -59,20 +77,10 @@ function createPagination({ page, totalPages, onChange }) {
  * @returns {void}
  */
 function bootstrap() {
-  const searchSection = document.querySelector("#search-section");
-  const gridSection = document.querySelector("#grid-section");
-  const paginationSection = document.querySelector("#pagination-section");
-  const statusSection = document.querySelector("#status-section");
-
-  if (
-    !(searchSection instanceof HTMLElement) ||
-    !(gridSection instanceof HTMLElement) ||
-    !(paginationSection instanceof HTMLElement) ||
-    !(statusSection instanceof HTMLElement)
-  ) {
-    console.error("Required layout sections are missing.");
-    return;
-  }
+  const searchSection = mustGetElement("#search-section");
+  const gridSection = mustGetElement("#grid-section");
+  const paginationSection = mustGetElement("#pagination-section");
+  const statusSection = mustGetElement("#status-section");
 
   const client = createProductsClient();
   const grid = createProductGrid();
