@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@12.16.1",
   "description": "Week 05 laboratory - DOM manipulation and Fetch API consumption with DummyJSON",
   "author": "Diego Alejandro Botina",
   "license": "MIT",
