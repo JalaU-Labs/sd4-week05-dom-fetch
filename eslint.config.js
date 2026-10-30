@@ -27,13 +27,18 @@ export default [
     },
   },
   {
-    files: [
-      "tests/**/*.js",
-      "vite.config.js",
-      "vitest.config.js",
-      "playwright.config.js",
-      "eslint.config.js",
-    ],
+    files: ["tests/**/*.js"],
+    languageOptions: {
+      ecmaVersion: 2024,
+      sourceType: "module",
+      globals: { ...globals.node, ...globals.browser },
+    },
+    rules: {
+      "no-console": "off",
+    },
+  },
+  {
+    files: ["vite.config.js", "vitest.config.js", "playwright.config.js", "eslint.config.js"],
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: "module",
