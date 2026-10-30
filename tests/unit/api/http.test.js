@@ -5,7 +5,7 @@ import { getJson } from "../../../src/api/http.js";
 
 /**
  * @param {unknown} body
- * @param {number} status
+ * @param {number} [status]
  * @returns {Response}
  */
 function jsonResponse(body, status = 200) {
@@ -69,22 +69,21 @@ describe("getJson", () => {
 
   it("aborts with TIMEOUT when the timeout elapses", async () => {
     vi.useFakeTimers();
-    /** @type {(reason: unknown) => void} */
-    let abortListener = () => {};
+    /** @type {() => void} */
+    let triggerAbort = () => {};
     vi.mocked(fetch).mockImplementationOnce((_url, init) => {
       return new Promise((_resolve, reject) => {
         const signal = /** @type {AbortSignal} */ (init?.signal);
         signal.addEventListener("abort", () => {
-          const err = new DOMException("aborted", "AbortError");
-          reject(err);
+          reject(new DOMException("aborted", "AbortError"));
         });
-        abortListener = () => signal.dispatchEvent(new Event("abort"));
+        triggerAbort = () => signal.dispatchEvent(new Event("abort"));
       });
     });
 
     const promise = getJson("https://example.test/slow", { timeoutMs: 50 });
     vi.advanceTimersByTime(60);
-    abortListener();
+    triggerAbort();
 
     await expect(promise).rejects.toBeInstanceOf(ApiError);
     await expect(promise).rejects.toMatchObject({ code: "TIMEOUT" });

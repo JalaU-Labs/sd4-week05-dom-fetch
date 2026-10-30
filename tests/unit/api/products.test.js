@@ -34,6 +34,17 @@ const listPayload = {
   limit: 12,
 };
 
+/**
+ * Builds a fresh Response on each invocation. Required because a Response body
+ * can only be consumed once, and the client may issue several requests within
+ * a single test.
+ *
+ * @returns {Promise<Response>}
+ */
+function freshListResponse() {
+  return Promise.resolve(jsonResponse(listPayload));
+}
+
 describe("createProductsClient", () => {
   beforeEach(() => {
     vi.stubGlobal("fetch", vi.fn());
@@ -57,7 +68,7 @@ describe("createProductsClient", () => {
   });
 
   it("notifies subscribers on request, response and cache-hit", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce(jsonResponse(listPayload));
+    vi.mocked(fetch).mockImplementationOnce(freshListResponse);
     const client = createProductsClient({ baseUrl: "https://dummy.test" });
     /** @type {string[]} */
     const events = [];
@@ -65,6 +76,10 @@ describe("createProductsClient", () => {
 
     await client.listProducts();
     await client.listProducts();
+    await client.listProducts();
+
+    expect(events).toEqual(["request", "response", "cache-hit", "cache-hit"]);
+
     unsubscribe();
     await client.listProducts();
 
@@ -72,7 +87,7 @@ describe("createProductsClient", () => {
   });
 
   it("unsubscribe stops delivering events", async () => {
-    vi.mocked(fetch).mockResolvedValue(jsonResponse(listPayload));
+    vi.mocked(fetch).mockImplementation(freshListResponse);
     const client = createProductsClient({ baseUrl: "https://dummy.test" });
     /** @type {number} */
     let calls = 0;
@@ -89,7 +104,7 @@ describe("createProductsClient", () => {
   });
 
   it("keeps independent state per client instance", async () => {
-    vi.mocked(fetch).mockResolvedValue(jsonResponse(listPayload));
+    vi.mocked(fetch).mockImplementation(freshListResponse);
     const a = createProductsClient({ baseUrl: "https://a.test" });
     const b = createProductsClient({ baseUrl: "https://b.test" });
 
@@ -138,7 +153,9 @@ describe("createProductsClient", () => {
     vi.mocked(fetch).mockImplementationOnce((_url, init) => {
       captured = /** @type {AbortSignal} */ (init?.signal);
       return new Promise((_resolve, reject) => {
-        captured?.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError")));
+        captured?.addEventListener("abort", () =>
+          reject(new DOMException("aborted", "AbortError")),
+        );
       });
     });
     const client = createProductsClient({ baseUrl: "https://dummy.test" });
