@@ -3,8 +3,9 @@ SHELL := /bin/sh
 
 PNPM ?= pnpm
 DOCKER_COMPOSE ?= docker compose
+PANDOC ?= pandoc
 
-.PHONY: help install clean dev build preview test-unit test-e2e test-e2e-install lint format format-check typecheck verify docker-build docker-up-dev docker-up-prod docker-down docker-logs docker-ps
+.PHONY: help install clean dev build preview test-unit test-e2e test-e2e-install lint format format-check typecheck verify docs docker-build docker-up-dev docker-up-prod docker-down docker-logs docker-ps
 
 help:
 	@echo "Available targets:"
@@ -21,6 +22,7 @@ help:
 	@echo "  format-check      Verify Prettier formatting"
 	@echo "  typecheck         Type-check JS with tsc"
 	@echo "  verify            Run lint, format:check, typecheck, unit tests and build"
+	@echo "  docs              Generate docs/documentation.pdf with Pandoc"
 	@echo "  docker-build      Build the production Docker image"
 	@echo "  docker-up-dev     Start the dev profile in Docker on port 5173"
 	@echo "  docker-up-prod    Build and start the prod profile in Docker on port 8080"
@@ -67,6 +69,18 @@ typecheck:
 
 verify:
 	$(PNPM) run verify
+
+docs:
+	$(PANDOC) docs/documentation.md \
+		-o docs/documentation.pdf \
+		--pdf-engine=xelatex \
+		-V geometry:margin=2.5cm \
+		-V colorlinks=true \
+		--highlight-style=tango \
+		--toc \
+		--toc-depth=2 \
+		--number-sections \
+		--resource-path=docs
 
 docker-build:
 	$(DOCKER_COMPOSE) --profile prod build prod
