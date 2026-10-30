@@ -11,6 +11,9 @@ playwright-report/
 test-results/
 .vitest/
 
+# Generated CSS (Tailwind CLI)
+src/css/output.css
+
 # Environment
 .env
 .env.*
