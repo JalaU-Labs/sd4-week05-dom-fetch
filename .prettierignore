@@ -6,3 +6,6 @@ test-results
 pnpm-lock.yaml
 src/css/output.css
 docs/*.pdf
+.pnpm-store
+public
+.git
