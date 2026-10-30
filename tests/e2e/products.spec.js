@@ -75,13 +75,13 @@ test("navigates to the next page", async ({ page }) => {
   await page.getByRole("button", { name: "Next" }).click();
   await expect(page.getByText("Page 2 of 2")).toBeVisible();
   await expect(page.locator("[data-product-id]")).toHaveCount(12);
-  await expect(page.getByText("Product 24")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Product 24" })).toBeVisible();
 });
 
 test("filters products by search query after debounce", async ({ page }) => {
   await page.getByRole("searchbox", { name: "Search products" }).fill("Product 24");
   await expect(page.locator("[data-product-id]")).toHaveCount(1);
-  await expect(page.getByText("Product 24")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Product 24" })).toBeVisible();
   await expect(page.getByText("Page 1 of 1")).toBeVisible();
 });
 
