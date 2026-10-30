@@ -5,6 +5,7 @@ workflow:
 
 stages:
   - verify
+  - e2e
   - deploy
 
 default:
@@ -38,11 +39,28 @@ verify:
       - dist
     expire_in: 1 week
 
+e2e:
+  stage: e2e
+  needs:
+    - verify
+  script:
+    - pnpm install --frozen-lockfile
+    - pnpm exec playwright install --with-deps chromium
+    - pnpm run test:e2e
+  artifacts:
+    when: always
+    name: "playwright-report-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - playwright-report
+      - test-results
+    expire_in: 1 week
+
 pages:
   stage: deploy
   needs:
     - job: verify
       artifacts: true
+    - job: e2e
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
   script:
