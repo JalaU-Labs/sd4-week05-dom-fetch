@@ -11,6 +11,8 @@ export default [
       "test-results/**",
       "src/css/output.css",
       "node_modules/**",
+      ".pnpm-store/**",
+      "public/**",
     ],
   },
   js.configs.recommended,
