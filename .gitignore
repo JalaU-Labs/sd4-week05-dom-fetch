@@ -4,12 +4,16 @@ node_modules/
 # Build output
 dist/
 build/
+public/
 
 # Test output
 coverage/
 playwright-report/
 test-results/
 .vitest/
+
+# pnpm store
+.pnpm-store/
 
 # Generated CSS (Tailwind CLI)
 src/css/output.css
